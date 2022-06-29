@@ -4,11 +4,11 @@ import (
 	"TOGO/configs"
 	"TOGO/responses"
 	"TOGO/untils"
+	"encoding/json"
 
 	//"TOGO/middleware"
 	"TOGO/models"
 	"context"
-	"encoding/json"
 	"fmt"
 	"net/http"
 	"time"
@@ -26,13 +26,12 @@ var userCollection *mongo.Collection = configs.GetCollection(configs.DB, "users"
 // var userCollection *dbiface.ConllectionAPI = configs.GetCollection(configs.DB, "users")
 var validate = validator.New()
 
-func GetAUser() http.HandlerFunc {
+func GetUser() http.HandlerFunc {
 	return func(rw http.ResponseWriter, r *http.Request) {
 		fmt.Println("Go to GetAUser")
-
+		userId := mux.Vars(r)["Id"]
+		fmt.Println("r:", r)
 		ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
-		params := mux.Vars(r)
-		userId := params["userId"]
 		var user models.User
 		defer cancel()
 
@@ -43,65 +42,67 @@ func GetAUser() http.HandlerFunc {
 			untils.Error(rw, err.Error(), http.StatusInternalServerError)
 			return
 		}
-
-		responses.WriteResponse(rw, http.StatusOK, user)
+		res := map[string]interface{}{"username": user.Username, "id": user.Id}
+		responses.WriteResponseUser(rw, "", http.StatusOK, res)
 	}
 }
 
-func EditAUser() http.HandlerFunc {
+func UpdateMe() http.HandlerFunc {
 	return func(rw http.ResponseWriter, r *http.Request) {
+		fmt.Println("go to UpdateMe")
 		ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
-		params := mux.Vars(r)
-		userId := params["userId"]
 		var user models.User
-		var check models.User
+		var user_client models.User
 		defer cancel()
+		// Get id from token
+		Id_User := r.Context().Value("Id_User").(string)
+		objId, _ := primitive.ObjectIDFromHex(Id_User)
 
-		objId, _ := primitive.ObjectIDFromHex(userId)
-		err := userCollection.FindOne(ctx, bson.M{"id": objId}).Decode(&check)
-		//validate the request body
-
-		if err := json.NewDecoder(r.Body).Decode(&user); err != nil {
+		// r.Body == user_client
+		if err := json.NewDecoder(r.Body).Decode(&user_client); err != nil {
 			untils.Error(rw, err.Error(), http.StatusBadRequest)
 			return
 		}
-		if user.Name == "" {
+
+		//Get User
+		err := userCollection.FindOne(ctx, bson.M{"id": objId}).Decode(&user)
+		if err != nil {
+			untils.Error(rw, err.Error(), http.StatusInternalServerError)
 		}
-		fmt.Println(user)
-		//use the validator library to validate required fields
-		if validationErr := validate.Struct(&user); validationErr != nil {
-			untils.Error(rw, validationErr.Error(), http.StatusBadRequest)
+		// Check password
+		if !models.CheckPasswordHash(user_client.Password, user.Password) {
+			untils.Error(rw, "Password Vaild", http.StatusBadRequest)
 			return
 		}
 
-		update := bson.M{"name": user.Name, "vip": user.Vip}
-
+		update := bson.M{"name": user_client.Name}
 		result, err := userCollection.UpdateOne(ctx, bson.M{"id": objId}, bson.M{"$set": update})
 		if err != nil {
 			untils.Error(rw, err.Error(), http.StatusInternalServerError)
 			return
 		}
 
-		//get updated user details
+		//get updated task details
 		var updatedUser models.User
 		if result.MatchedCount == 1 {
 			err := userCollection.FindOne(ctx, bson.M{"id": objId}).Decode(&updatedUser)
-
 			if err != nil {
 				untils.Error(rw, err.Error(), http.StatusInternalServerError)
 				return
 			}
 		}
 
-		responses.WriteResponse(rw, http.StatusOK, updatedUser)
+		res := map[string]interface{}{"id": updatedUser.Id, "name": updatedUser.Name}
+		responses.WriteResponse(rw, http.StatusCreated, res)
+
 	}
 }
 
-func DeleteAUser() http.HandlerFunc {
+func DeleteUser() http.HandlerFunc {
 	return func(rw http.ResponseWriter, r *http.Request) {
 		ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 		params := mux.Vars(r)
-		userId := params["userId"]
+		userId := params["Id"]
 		objId, _ := primitive.ObjectIDFromHex(userId)
 		defer cancel()
 		// detele task of user
@@ -166,7 +167,6 @@ func GetAllUser() http.HandlerFunc {
 
 			users = append(users, singleUser)
 		}
-
 		responses.WriteResponse(rw, http.StatusOK, users)
 	}
 }
@@ -176,23 +176,18 @@ func GetMe() http.HandlerFunc {
 		fmt.Println("go to Getme")
 		ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 		var user models.User
+		defer cancel()
 		Id_User := r.Context().Value("Id_User").(string)
 		objId, _ := primitive.ObjectIDFromHex(Id_User)
-		defer cancel()
 
 		err := userCollection.FindOne(ctx, bson.M{"id": objId}).Decode(&user)
 		if err != nil {
 			untils.Error(rw, err.Error(), http.StatusInternalServerError)
 			return
 		}
-		newUser := models.User{
-			Id:       user.Id,
-			Username: user.Username,
-			Name:     user.Name,
-			Vip:      user.Vip,
-			Limit:    user.Limit,
-		}
-		responses.WriteResponse(rw, http.StatusOK, newUser)
+
+		res := map[string]interface{}{"username": user.Username, "name": user.Name, "id": user.Id}
+		responses.WriteResponseUser(rw, "", http.StatusOK, res)
 
 	}
 }

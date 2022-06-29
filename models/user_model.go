@@ -10,7 +10,7 @@ type User struct {
 	Id       primitive.ObjectID `json:"id,omitempty"`
 	Username string             `json:"username,omitempty" validate:"required,min=4,max=25"`
 	Password string             `json:"password,omitempty" validate:"required"`
-	Name     string             `json:"name,omitempty"`
+	Name     string             `json:"name,omitempty" validate:"min=2,max=16"`
 	Vip      int                `json:"vip,omitempty"`
 	Limit    int                `json:"limit"`
 }

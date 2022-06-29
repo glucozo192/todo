@@ -1,4 +1,4 @@
-package main
+package controllers_test
 
 import (
 	"TOGO/configs"
@@ -10,13 +10,15 @@ import (
 )
 
 func TestMain(m *testing.M) {
-	router := mux.NewRouter()
 
+	router := mux.NewRouter()
+	code := m.Run()
 	//run database
 	configs.ConnectDB()
+
+	//routes
 	routes.UserRoute(router)
 	routes.TaskRoute(router)
-	code := m.Run()
-	os.Exit(code)
 
+	defer os.Exit(code)
 }

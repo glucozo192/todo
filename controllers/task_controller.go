@@ -79,13 +79,14 @@ func CreateTask() http.HandlerFunc {
 			Status:    "doing",
 		}
 
-		result, err := taskCollection.InsertOne(ctx, newTask)
+		_, err = taskCollection.InsertOne(ctx, newTask)
 		if err != nil {
 			untils.Error(rw, "db not insert", http.StatusInternalServerError)
 			return
 		}
 
-		responses.WriteResponse(rw, http.StatusCreated, result)
+		res := map[string]interface{}{"id": newTask.Id, "UserId": newTask.Id_user, "name": newTask.Name, "content": newTask.Content, "created_at": newTask.CreatedAt}
+		responses.WriteResponse(rw, http.StatusCreated, res)
 
 	}
 }

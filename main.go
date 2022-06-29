@@ -7,7 +7,13 @@ import (
 	"net/http"
 
 	"github.com/gorilla/mux"
+	"go.mongodb.org/mongo-driver/mongo"
 )
+
+type App struct {
+	Router *mux.Router
+	DB     *mongo.Database
+}
 
 func main() {
 	router := mux.NewRouter()

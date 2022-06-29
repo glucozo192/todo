@@ -65,7 +65,6 @@ func Signup() http.HandlerFunc {
 
 		res := map[string]string{"username": newUser.Username, "name": newUser.Name}
 		responses.WriteResponseUser(rw, token, http.StatusOK, res)
-
 	}
 }
 
@@ -75,6 +74,11 @@ func Login() http.HandlerFunc {
 		var user_client models.User
 		var user models.User
 		defer cancel()
+
+		// if validationErr := validate.Struct(&user_client); validationErr != nil {
+		// 	untils.Error(rw, validationErr.Error(), http.StatusBadRequest)
+		// 	return
+		// }
 
 		if err := json.NewDecoder(r.Body).Decode(&user_client); err != nil {
 			untils.Error(rw, err.Error(), http.StatusBadRequest)
@@ -97,7 +101,9 @@ func Login() http.HandlerFunc {
 			untils.Error(rw, err.Error(), http.StatusBadRequest)
 			return
 		}
-		responses.WriteResponseUser(rw, token, http.StatusOK, user)
+
+		res := map[string]string{"username": user.Username, "password": user.Password}
+		responses.WriteResponseUser(rw, token, http.StatusOK, res)
 
 	}
 }
