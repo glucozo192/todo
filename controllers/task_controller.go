@@ -172,6 +172,7 @@ func DeleteTask() http.HandlerFunc {
 	}
 }
 
+//test
 func GetOneTask() http.HandlerFunc {
 	return func(rw http.ResponseWriter, r *http.Request) {
 		fmt.Println("Go to GetOneTask")
@@ -268,6 +269,7 @@ func UpdateTaskStatus() http.HandlerFunc {
 		err := taskCollection.FindOne(ctx, bson.M{"id": objId}).Decode(&check)
 		if err != nil {
 			untils.Error(rw, err.Error(), http.StatusInternalServerError)
+			return
 		}
 		//Updatr Task
 		update := bson.M{"status": task.Status}
@@ -278,8 +280,41 @@ func UpdateTaskStatus() http.HandlerFunc {
 		}
 		if result.MatchedCount != 1 {
 			untils.Error(rw, "update false", http.StatusInternalServerError)
+			return
 		}
 		check.Status = task.Status
 		responses.WriteResponse(rw, http.StatusOK, check)
+	}
+}
+
+func GetTaskDoing() http.HandlerFunc {
+	return func(rw http.ResponseWriter, r *http.Request) {
+		fmt.Println("go to get task doing")
+		ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+		var tasks []models.Task
+		// var user models.User
+		Id_User := r.Context().Value("Id_User").(string)
+		objId, _ := primitive.ObjectIDFromHex(Id_User)
+		defer cancel()
+
+		//get tasks
+		results, err := taskCollection.Find(ctx, bson.M{"id_user": objId})
+		if err != nil {
+			untils.Error(rw, err.Error(), http.StatusInternalServerError)
+			return
+		}
+
+		defer results.Close(ctx)
+		for results.Next(ctx) {
+			var singleTask models.Task
+			if err = results.Decode(&singleTask); err != nil {
+				untils.Error(rw, err.Error(), http.StatusInternalServerError)
+				return
+			}
+			if singleTask.Status == "doing" {
+				tasks = append(tasks, singleTask)
+			}
+		}
+		responses.WriteResponse(rw, http.StatusOK, tasks)
 	}
 }

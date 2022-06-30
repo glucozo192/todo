@@ -93,7 +93,7 @@ func UpdateMe() http.HandlerFunc {
 		}
 
 		res := map[string]interface{}{"id": updatedUser.Id, "name": updatedUser.Name}
-		responses.WriteResponse(rw, http.StatusCreated, res)
+		responses.WriteResponse(rw, http.StatusOK, res)
 
 	}
 }
