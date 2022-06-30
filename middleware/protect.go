@@ -2,6 +2,7 @@ package middleware
 
 import (
 	"TOGO/untils"
+
 	"context"
 	"net/http"
 	"os"
@@ -15,16 +16,20 @@ import (
 
 func AuthMiddleware(next http.HandlerFunc) http.HandlerFunc {
 	return http.HandlerFunc(func(rw http.ResponseWriter, r *http.Request) {
+
 		authHeader := strings.Split(r.Header.Get("Authorization"), "Bearer ")
+
 		if len(authHeader) != 2 {
 			untils.Error(rw, "token vaild", http.StatusBadRequest)
 			return
 		}
+
 		jwtToken := authHeader[1]
 		if jwtToken == "" {
 			untils.Error(rw, "token vaild", http.StatusBadRequest)
 			return
 		}
+
 		claims := jwt.MapClaims{}
 		token, err := jwt.ParseWithClaims(jwtToken, claims, func(token *jwt.Token) (interface{}, error) {
 			return []byte(os.Getenv("SECRET_JWT")), nil

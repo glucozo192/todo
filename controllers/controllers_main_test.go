@@ -5,6 +5,7 @@ import (
 	"TOGO/controllers"
 	"TOGO/middleware"
 	"TOGO/models"
+
 	"context"
 	"net/http"
 	"net/http/httptest"
@@ -25,7 +26,7 @@ var NewId primitive.ObjectID
 
 var a App
 var NewToken string
-var tokenMain string = "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdXRob3JpemVkIjp0cnVlLCJleHAiOjE2NjA4NzgxNzMsImlkIjoiNjJiYWJkNTA0OTBjMmE0ODc4MTViYzcxIn0.wcvPD8ly0YMoSiRrUkCQ3upS2xjby4hOU7LLybk7pqQ"
+var tokenMain string = "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdXRob3JpemVkIjp0cnVlLCJleHAiOjE2NjA5MDAxMzQsImlkIjoiNjJiZDY4MjYyOWFmNTIwMzU2ZjhmYzBhIn0.CP6ubpuPdd67ERZAZ7tL1NHQ7QCZO-usiIxYFU7gwik"
 var userCollection *mongo.Collection = configs.GetCollection(configs.DB, "users")
 
 func TestMain(m *testing.M) {

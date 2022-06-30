@@ -3,6 +3,7 @@ package controllers_test
 import (
 	"TOGO/controllers"
 	"TOGO/models"
+
 	"bytes"
 	"encoding/json"
 	"fmt"
@@ -50,7 +51,7 @@ func TestSignup(t *testing.T) {
 }
 
 func TestLogin(t *testing.T) {
-	var jsonStr = []byte(`{"username": "tuanchoi1", "password": "123456"}`)
+	var jsonStr = []byte(`{"username": "tuantest", "password": "123456"}`)
 	req, err := http.NewRequest("POST", "/user/login", bytes.NewBuffer(jsonStr))
 	if err != nil {
 		t.Fatal(err)
@@ -67,7 +68,7 @@ func TestLogin(t *testing.T) {
 			status, http.StatusOK)
 	}
 
-	if r.Data["username"] != "tuanchoi1" {
+	if r.Data["username"] != "tuantest" {
 		t.Errorf("handler returned wrong data: got %v want %v", r.Data["username"], "tuanchoi1")
 	}
 

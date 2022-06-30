@@ -13,6 +13,7 @@ type User struct {
 	Name     string             `json:"name,omitempty" validate:"max=16"`
 	Limit    int                `json:"limit"`
 	Status   bool
+	Role     string
 }
 
 func HashPassword(password string) (string, error) {

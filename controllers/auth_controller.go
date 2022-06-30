@@ -5,9 +5,9 @@ import (
 	"TOGO/models"
 	"TOGO/responses"
 	"TOGO/untils"
+
 	"context"
 	"encoding/json"
-	"fmt"
 	"net/http"
 	"time"
 
@@ -47,8 +47,8 @@ func Signup() http.HandlerFunc {
 			Name:     user.Name,
 			Limit:    10,
 			Status:   true,
+			Role:     "user",
 		}
-		fmt.Println("id : ", newUser.Id)
 		// add obj
 		_, err := userCollection.InsertOne(ctx, newUser)
 		if err != nil {

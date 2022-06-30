@@ -5,9 +5,9 @@ import (
 	"TOGO/models"
 	"TOGO/responses"
 	"TOGO/untils"
+
 	"context"
 	"encoding/json"
-	"fmt"
 	"net/http"
 	"time"
 
@@ -21,7 +21,6 @@ var taskCollection *mongo.Collection = configs.GetCollection(configs.DB, "tasks"
 
 func CreateTask() http.HandlerFunc {
 	return func(rw http.ResponseWriter, r *http.Request) {
-		fmt.Println("Go to CreateTask")
 		ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 		var task models.Task
 		var check models.User
@@ -215,7 +214,6 @@ func UpdateTask() http.HandlerFunc {
 		if task.Content == "" {
 			task.Content = check.Content
 		}
-		fmt.Println(task)
 		//use the validator library to validate required fields
 		if validationErr := validate.Struct(&task); validationErr != nil {
 			untils.Error(rw, validationErr.Error(), http.StatusBadRequest)
@@ -281,7 +279,6 @@ func UpdateTaskStatus() http.HandlerFunc {
 
 func GetTaskDoing() http.HandlerFunc {
 	return func(rw http.ResponseWriter, r *http.Request) {
-		fmt.Println("go to get task doing")
 		ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 		var tasks []models.Task
 		// var user models.User

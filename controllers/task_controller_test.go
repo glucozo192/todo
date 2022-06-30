@@ -3,6 +3,7 @@ package controllers_test
 import (
 	"TOGO/controllers"
 	"TOGO/middleware"
+
 	"bytes"
 	"encoding/json"
 	"net/http"
@@ -56,7 +57,7 @@ func TestGetTask(t *testing.T) {
 }
 
 func TestGetOneTask(t *testing.T) {
-	req, _ := http.NewRequest("GET", "/task/62babd5a490c2a487815bc75", nil)
+	req, _ := http.NewRequest("GET", "/task/62bd689029af520356f8fc0e", nil)
 
 	//send token
 	token := tokenMain
@@ -69,18 +70,19 @@ func TestGetOneTask(t *testing.T) {
 		t.Errorf("handler returned wrong data: got %v want %v", r.Status, http.StatusOK)
 	}
 
-	if r.Data["name"] != "task-tuanchoi1" {
+	if r.Data["name"] != "Task-tuantest" {
 		t.Errorf("handler returned wrong data: got %v want %v", r.Data["name"], "task-tuanchoi1")
 	}
 
 }
 
+// user tuantest2
 func TestUpdateTask(t *testing.T) {
-	var jsonStr = []byte(`{"name": "task-tuanchoi1", "content": "test update content"}`)
-	req, _ := http.NewRequest("PUT", "/task/62babd5a490c2a487815bc75", bytes.NewBuffer(jsonStr))
+	var jsonStr = []byte(`{"name": "task-tuantest2", "content": "test update content"}`)
+	req, _ := http.NewRequest("PUT", "/task/62bd693829af520356f8fc12", bytes.NewBuffer(jsonStr))
 
 	//send token
-	token := tokenMain
+	token := "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdXRob3JpemVkIjp0cnVlLCJleHAiOjE2NjA5MDA0MDYsImlkIjoiNjJiZDY5MzYyOWFmNTIwMzU2ZjhmYzEwIn0.hRHTzdk4Cy2t-tIaorXgoT87WPXRZlN3dC_vimgVE5Y"
 	req.Header.Set("Authorization", token)
 	res := ExcuteRoute(req)
 	var r Response
@@ -90,7 +92,7 @@ func TestUpdateTask(t *testing.T) {
 		t.Errorf("handler returned wrong data: got %v want %v", r.Status, http.StatusOK)
 	}
 
-	if r.Data["name"] != "task-tuanchoi1" {
+	if r.Data["name"] != "task-tuantest2" {
 		t.Errorf("handler returned wrong data: got %v want %v", r.Data["name"], "test update task")
 	}
 
@@ -101,7 +103,7 @@ func TestUpdateTask(t *testing.T) {
 
 func TestUpdateTaskStatus(t *testing.T) {
 	var jsonStr = []byte(`{"status": "completed"}`)
-	req, _ := http.NewRequest("PUT", "/task/status/62babd5a490c2a487815bc75", bytes.NewBuffer(jsonStr))
+	req, _ := http.NewRequest("PUT", "/task/status/62bd688f29af520356f8fc0c", bytes.NewBuffer(jsonStr))
 	//send token
 	token := tokenMain
 	req.Header.Set("Authorization", token)

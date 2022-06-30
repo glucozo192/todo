@@ -2,13 +2,12 @@ package controllers
 
 import (
 	"TOGO/configs"
+	"TOGO/models"
 	"TOGO/responses"
 	"TOGO/untils"
-	"encoding/json"
 
-	//"TOGO/middleware"
-	"TOGO/models"
 	"context"
+	"encoding/json"
 	"net/http"
 	"time"
 
@@ -141,8 +140,27 @@ func DeleteUser() http.HandlerFunc {
 func GetAllUser() http.HandlerFunc {
 	return func(rw http.ResponseWriter, r *http.Request) {
 		ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+		var user models.User
 		var users []models.User
 		defer cancel()
+
+		// Get id from token
+		Id_User := r.Context().Value("Id_User").(string)
+		objId, _ := primitive.ObjectIDFromHex(Id_User)
+
+		// Get User
+		err := userCollection.FindOne(ctx, bson.M{"id": objId}).Decode(&user)
+
+		if user.Role != "admin" {
+			untils.Error(rw, "do not permission", http.StatusInternalServerError)
+			return
+		}
+
+		if err != nil {
+			untils.Error(rw, err.Error(), http.StatusInternalServerError)
+			return
+		}
+
 		results, err := userCollection.Find(ctx, bson.M{})
 
 		if err != nil {

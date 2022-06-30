@@ -13,7 +13,7 @@ func UserRoute(router *mux.Router) {
 	router.HandleFunc("/user/{Id}", controllers.DeleteUser()).Methods("DELETE")
 	//----------------------------------------------------------------
 	router.HandleFunc("/user/signup", controllers.Signup()).Methods("POST")
-	router.HandleFunc("/users", controllers.GetAllUser()).Methods("GET")
+	router.HandleFunc("/users", middleware.AuthMiddleware(controllers.GetAllUser())).Methods("GET")
 	router.HandleFunc("/user/login", controllers.Login()).Methods("POST")
 	router.HandleFunc("/me", middleware.AuthMiddleware(controllers.GetMe())).Methods("GET")
 }

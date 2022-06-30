@@ -3,6 +3,7 @@ package controllers_test
 import (
 	"TOGO/controllers"
 	"TOGO/middleware"
+
 	"bytes"
 	"encoding/json"
 	"fmt"
@@ -29,14 +30,14 @@ func TestGetMe(t *testing.T) {
 			status, http.StatusOK)
 	}
 	//check user
-	if r.Data["username"] != "tuanchoi1" {
+	if r.Data["username"] != "tuantest" {
 		t.Errorf("handler returned wrong status code: got %v want %v",
 			r.Data["username"], "tuanchoi1")
 	}
 }
 
 func TestGetUser(t *testing.T) {
-	req, err := http.NewRequest("GET", "/user/62babd50490c2a487815bc71", nil)
+	req, err := http.NewRequest("GET", "/user/62bd682629af520356f8fc0a", nil)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -50,7 +51,7 @@ func TestGetUser(t *testing.T) {
 			status, http.StatusOK)
 	}
 
-	if r.Data["username"] != "tuanchoi1" {
+	if r.Data["username"] != "tuantest" {
 		t.Errorf("handler returned wrong status code: got %v want %v",
 			r.Data["username"], "tuanchoi1")
 	}
@@ -111,8 +112,10 @@ func TestGetAllUser(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
+	token := "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdXRob3JpemVkIjp0cnVlLCJleHAiOjE2NjA5MDA3MzIsImlkIjoiNjJiZDY0NDRlNTIyYjdhYmQwODY1Mzg3In0.F8LqqnDt9yQKfgcHQGbejQVURxgumVlEBk_kILGE-kc"
+	req.Header.Set("Authorization", token)
 	req.Header.Set("Content-Type", "application/json")
-	handler := http.HandlerFunc(controllers.GetAllUser())
+	handler := http.HandlerFunc(middleware.AuthMiddleware(controllers.GetAllUser()))
 	rr := httptest.NewRecorder()
 	handler.ServeHTTP(rr, req)
 	var r Response
