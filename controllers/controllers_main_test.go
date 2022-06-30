@@ -4,21 +4,29 @@ import (
 	"TOGO/configs"
 	"TOGO/controllers"
 	"TOGO/middleware"
+	"TOGO/models"
+	"context"
 	"net/http"
 	"net/http/httptest"
 	"os"
 	"testing"
+	"time"
 
 	"github.com/gorilla/mux"
+	"go.mongodb.org/mongo-driver/bson/primitive"
+	"go.mongodb.org/mongo-driver/mongo"
 )
 
 type App struct {
 	Router *mux.Router
 }
 
-var a App
+var NewId primitive.ObjectID
 
+var a App
+var NewToken string
 var tokenMain string = "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdXRob3JpemVkIjp0cnVlLCJleHAiOjE2NjA4NzgxNzMsImlkIjoiNjJiYWJkNTA0OTBjMmE0ODc4MTViYzcxIn0.wcvPD8ly0YMoSiRrUkCQ3upS2xjby4hOU7LLybk7pqQ"
+var userCollection *mongo.Collection = configs.GetCollection(configs.DB, "users")
 
 func TestMain(m *testing.M) {
 	a.Router = mux.NewRouter()
@@ -45,4 +53,28 @@ func ExcuteRoute(r *http.Request) *httptest.ResponseRecorder {
 	handler := http.Handler(a.Router)
 	handler.ServeHTTP(rr, r)
 	return rr
+}
+
+func CreateTestUser() http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+		defer cancel()
+		Id := primitive.NewObjectID()
+		username := "testuser"
+		password := "123456"
+		name := "test"
+		hashPwd, _ := models.HashPassword(password)
+		newUser := models.User{
+			Id:       Id,
+			Username: username,
+			Password: hashPwd,
+			Name:     name,
+			Limit:    10,
+		}
+		NewId = Id
+		// add obj
+		_, _ = userCollection.InsertOne(ctx, newUser)
+		Token, _ := middleware.CreateToken(newUser.Id)
+		NewToken = "Bearer " + Token
+	}
 }

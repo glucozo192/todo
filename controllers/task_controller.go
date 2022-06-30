@@ -93,7 +93,6 @@ func CreateTask() http.HandlerFunc {
 
 func GetTask() http.HandlerFunc {
 	return func(rw http.ResponseWriter, r *http.Request) {
-		fmt.Println("go to GetTask")
 		ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 		var tasks []models.Task
 		// var user models.User
@@ -123,7 +122,6 @@ func GetTask() http.HandlerFunc {
 
 func GetAllTask() http.HandlerFunc {
 	return func(rw http.ResponseWriter, r *http.Request) {
-		fmt.Println("go to GetAllTask")
 		ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 		var tasks []models.Task
 		defer cancel()
@@ -149,7 +147,6 @@ func GetAllTask() http.HandlerFunc {
 
 func DeleteTask() http.HandlerFunc {
 	return func(rw http.ResponseWriter, r *http.Request) {
-		fmt.Println("Go to DeleteTask")
 		ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 		params := mux.Vars(r)
 		taskId := params["id"]
@@ -175,7 +172,6 @@ func DeleteTask() http.HandlerFunc {
 //test
 func GetOneTask() http.HandlerFunc {
 	return func(rw http.ResponseWriter, r *http.Request) {
-		fmt.Println("Go to GetOneTask")
 		ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 		params := mux.Vars(r)
 		taskId := params["id"]
@@ -196,7 +192,6 @@ func GetOneTask() http.HandlerFunc {
 
 func UpdateTask() http.HandlerFunc {
 	return func(rw http.ResponseWriter, r *http.Request) {
-		fmt.Println("Go to UpdateTask")
 		ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 		params := mux.Vars(r)
 		taskId := params["id"]
@@ -211,7 +206,6 @@ func UpdateTask() http.HandlerFunc {
 		}
 		//validate the request body
 		if err := json.NewDecoder(r.Body).Decode(&task); err != nil {
-			fmt.Println("erro from val")
 			untils.Error(rw, err.Error(), http.StatusBadRequest)
 			return
 		}
@@ -251,7 +245,6 @@ func UpdateTask() http.HandlerFunc {
 
 func UpdateTaskStatus() http.HandlerFunc {
 	return func(rw http.ResponseWriter, r *http.Request) {
-		fmt.Println("GO to update task status")
 		ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 		params := mux.Vars(r)
 		taskId := params["id"]
@@ -261,7 +254,6 @@ func UpdateTaskStatus() http.HandlerFunc {
 		defer cancel()
 		//validate the request body
 		if err := json.NewDecoder(r.Body).Decode(&task); err != nil {
-			fmt.Println("erro from val")
 			untils.Error(rw, err.Error(), http.StatusBadRequest)
 			return
 		}

@@ -9,7 +9,6 @@ import (
 	//"TOGO/middleware"
 	"TOGO/models"
 	"context"
-	"fmt"
 	"net/http"
 	"time"
 
@@ -28,9 +27,7 @@ var validate = validator.New()
 
 func GetUser() http.HandlerFunc {
 	return func(rw http.ResponseWriter, r *http.Request) {
-		fmt.Println("Go to GetAUser")
 		userId := mux.Vars(r)["Id"]
-		fmt.Println("r:", r)
 		ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 		var user models.User
 		defer cancel()
@@ -49,7 +46,6 @@ func GetUser() http.HandlerFunc {
 
 func UpdateMe() http.HandlerFunc {
 	return func(rw http.ResponseWriter, r *http.Request) {
-		fmt.Println("go to UpdateMe")
 		ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 		var user models.User
 		var user_client models.User
@@ -91,7 +87,6 @@ func UpdateMe() http.HandlerFunc {
 				return
 			}
 		}
-
 		res := map[string]interface{}{"id": updatedUser.Id, "name": updatedUser.Name}
 		responses.WriteResponse(rw, http.StatusOK, res)
 
@@ -145,7 +140,6 @@ func DeleteUser() http.HandlerFunc {
 
 func GetAllUser() http.HandlerFunc {
 	return func(rw http.ResponseWriter, r *http.Request) {
-		fmt.Println("go to GetAllUser")
 		ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 		var users []models.User
 		defer cancel()
@@ -173,7 +167,6 @@ func GetAllUser() http.HandlerFunc {
 
 func GetMe() http.HandlerFunc {
 	return func(rw http.ResponseWriter, r *http.Request) {
-		fmt.Println("go to Getme")
 		ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 		var user models.User
 		defer cancel()

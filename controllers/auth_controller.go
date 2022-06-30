@@ -17,7 +17,6 @@ import (
 
 func Signup() http.HandlerFunc {
 	return func(rw http.ResponseWriter, r *http.Request) {
-		fmt.Println("go to Signup")
 		ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 		var user models.User
 		var check models.User
@@ -46,10 +45,10 @@ func Signup() http.HandlerFunc {
 			Username: user.Username,
 			Password: hashPwd,
 			Name:     user.Name,
-			Vip:      user.Vip,
-			Limit:    user.Vip + 10,
+			Limit:    10,
+			Status:   true,
 		}
-
+		fmt.Println("id : ", newUser.Id)
 		// add obj
 		_, err := userCollection.InsertOne(ctx, newUser)
 		if err != nil {
@@ -63,7 +62,7 @@ func Signup() http.HandlerFunc {
 			return
 		}
 
-		res := map[string]string{"username": newUser.Username, "name": newUser.Name}
+		res := map[string]interface{}{"username": newUser.Username, "name": newUser.Name, "id": newUser.Id}
 		responses.WriteResponseUser(rw, token, http.StatusOK, res)
 	}
 }
@@ -74,11 +73,6 @@ func Login() http.HandlerFunc {
 		var user_client models.User
 		var user models.User
 		defer cancel()
-
-		// if validationErr := validate.Struct(&user_client); validationErr != nil {
-		// 	untils.Error(rw, validationErr.Error(), http.StatusBadRequest)
-		// 	return
-		// }
 
 		if err := json.NewDecoder(r.Body).Decode(&user_client); err != nil {
 			untils.Error(rw, err.Error(), http.StatusBadRequest)
@@ -102,7 +96,7 @@ func Login() http.HandlerFunc {
 			return
 		}
 
-		res := map[string]string{"username": user.Username, "password": user.Password}
+		res := map[string]interface{}{"username": user.Username, "password": user.Password, "id": user.Id}
 		responses.WriteResponseUser(rw, token, http.StatusOK, res)
 
 	}

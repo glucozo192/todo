@@ -22,7 +22,7 @@ func TestCreateTask(t *testing.T) {
 	rr := httptest.NewRecorder()
 	handler := http.Handler(middleware.AuthMiddleware(controllers.CreateTask()))
 	handler.ServeHTTP(rr, req)
-	var r controllers.Response
+	var r Response
 	json.Unmarshal(rr.Body.Bytes(), &r)
 
 	if r.Status != http.StatusCreated {
@@ -47,7 +47,7 @@ func TestGetTask(t *testing.T) {
 	rr := httptest.NewRecorder()
 	handler := http.Handler(middleware.AuthMiddleware(controllers.GetTask()))
 	handler.ServeHTTP(rr, req)
-	var r controllers.Response
+	var r Response
 	json.Unmarshal(rr.Body.Bytes(), &r)
 
 	if r.Status != http.StatusOK {
@@ -62,7 +62,7 @@ func TestGetOneTask(t *testing.T) {
 	token := tokenMain
 	req.Header.Set("Authorization", token)
 	res := ExcuteRoute(req)
-	var r controllers.Response
+	var r Response
 	json.Unmarshal(res.Body.Bytes(), &r)
 
 	if r.Status != http.StatusOK {
@@ -83,7 +83,7 @@ func TestUpdateTask(t *testing.T) {
 	token := tokenMain
 	req.Header.Set("Authorization", token)
 	res := ExcuteRoute(req)
-	var r controllers.Response
+	var r Response
 	json.Unmarshal(res.Body.Bytes(), &r)
 
 	if r.Status != http.StatusOK {
@@ -106,7 +106,7 @@ func TestUpdateTaskStatus(t *testing.T) {
 	token := tokenMain
 	req.Header.Set("Authorization", token)
 	res := ExcuteRoute(req)
-	var r controllers.Response
+	var r Response
 	json.Unmarshal(res.Body.Bytes(), &r)
 
 	if r.Status != http.StatusOK {
@@ -127,7 +127,7 @@ func TestGetTaskDoing(t *testing.T) {
 	rr := httptest.NewRecorder()
 	handler := http.Handler(middleware.AuthMiddleware(controllers.GetTaskDoing()))
 	handler.ServeHTTP(rr, req)
-	var r controllers.Response
+	var r Response
 	json.Unmarshal(rr.Body.Bytes(), &r)
 
 	if r.Status != http.StatusOK {

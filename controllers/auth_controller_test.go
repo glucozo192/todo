@@ -1,9 +1,11 @@
-package controllers
+package controllers_test
 
 import (
+	"TOGO/controllers"
 	"TOGO/models"
 	"bytes"
 	"encoding/json"
+	"fmt"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -17,7 +19,7 @@ type Response struct {
 }
 
 func TestSignup(t *testing.T) {
-	var jsonStr = []byte(`{"username": "tuanchoitest17", "password": "123456","name":"Nguyen tuan"}`)
+	var jsonStr = []byte(`{"username": "tuanchoitest13", "password": "123456","name":"Nguyen tuan"}`)
 
 	req, err := http.NewRequest("POST", "/user/signup", bytes.NewBuffer(jsonStr))
 	if err != nil {
@@ -25,7 +27,7 @@ func TestSignup(t *testing.T) {
 	}
 	req.Header.Set("Content-Type", "application/json")
 	rr := httptest.NewRecorder()
-	handler := http.HandlerFunc(Signup())
+	handler := http.HandlerFunc(controllers.Signup())
 	handler.ServeHTTP(rr, req)
 	var r Response
 	json.Unmarshal(rr.Body.Bytes(), &r)
@@ -35,12 +37,16 @@ func TestSignup(t *testing.T) {
 			status, http.StatusOK)
 	}
 
-	if r.Data["username"] != "tuanchoitest17" {
-		t.Errorf("handler returned wrong data: got %v want %v", r.Data["username"], "tuanchoitest17")
+	if r.Data["username"] != "tuanchoitest13" {
+		t.Errorf("handler returned wrong data: got %v want %v", r.Data["username"], "tuanchoitest13")
 	}
 	if r.Data["name"] != "Nguyen tuan" {
 		t.Errorf("handler returned wrong data: got %v want %v", r.Data["name"], "Nguyen tuan")
 	}
+
+	rq, _ := http.NewRequest("DELETE", fmt.Sprintf("/user/%s", r.Data["id"]), nil)
+	req.Header.Set("Content-Type", "application/json")
+	_ = ExcuteRoute(rq)
 }
 
 func TestLogin(t *testing.T) {
@@ -51,7 +57,7 @@ func TestLogin(t *testing.T) {
 	}
 	req.Header.Set("Content-Type", "application/json")
 	rr := httptest.NewRecorder()
-	handler := http.HandlerFunc(Login())
+	handler := http.HandlerFunc(controllers.Login())
 	handler.ServeHTTP(rr, req)
 	var r Response
 	json.Unmarshal(rr.Body.Bytes(), &r)

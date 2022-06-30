@@ -3,7 +3,6 @@ package middleware
 import (
 	"TOGO/untils"
 	"context"
-	"fmt"
 	"net/http"
 	"os"
 	"strings"
@@ -14,9 +13,8 @@ import (
 	//"github.com/gorilla/context"
 )
 
-func AuthMiddleware(next http.Handler) http.Handler {
+func AuthMiddleware(next http.HandlerFunc) http.HandlerFunc {
 	return http.HandlerFunc(func(rw http.ResponseWriter, r *http.Request) {
-		fmt.Println("Go to middleware")
 		authHeader := strings.Split(r.Header.Get("Authorization"), "Bearer ")
 		if len(authHeader) != 2 {
 			untils.Error(rw, "token vaild", http.StatusBadRequest)

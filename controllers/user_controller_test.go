@@ -18,9 +18,9 @@ func TestGetMe(t *testing.T) {
 
 	req.Header.Set("Content-Type", "application/json")
 	rr := httptest.NewRecorder()
-	handler := http.Handler(middleware.AuthMiddleware(controllers.GetMe()))
+	handler := http.HandlerFunc(middleware.AuthMiddleware(controllers.GetMe()))
 	handler.ServeHTTP(rr, req)
-	var r controllers.Response
+	var r Response
 	json.Unmarshal(rr.Body.Bytes(), &r)
 
 	//check satatus code
@@ -42,7 +42,7 @@ func TestGetUser(t *testing.T) {
 	}
 	req.Header.Set("Content-Type", "application/json")
 	res := ExcuteRoute(req)
-	var r controllers.Response
+	var r Response
 	json.Unmarshal(res.Body.Bytes(), &r)
 
 	if status := r.Status; status != http.StatusOK {
@@ -67,7 +67,7 @@ func TestUpdateMe(t *testing.T) {
 	rr := httptest.NewRecorder()
 	handler := http.Handler(middleware.AuthMiddleware(controllers.UpdateMe()))
 	handler.ServeHTTP(rr, req)
-	var r controllers.Response
+	var r Response
 	json.Unmarshal(rr.Body.Bytes(), &r)
 
 	if r.Status != http.StatusOK {
@@ -82,18 +82,23 @@ func TestUpdateMe(t *testing.T) {
 }
 
 func TestDeleteUser(t *testing.T) {
-	req, err := http.NewRequest("DELETE", fmt.Sprintf("/user/%s", "62b97c5c7038a7cf7b9f283e"), nil)
+	rq, _ := http.NewRequest("POST", "/user/login", nil)
+	handler := http.HandlerFunc(CreateTestUser())
+	rr := httptest.NewRecorder()
+	handler.ServeHTTP(rr, rq)
+
+	req, err := http.NewRequest("DELETE", fmt.Sprintf("/user/%s", NewId.Hex()), nil)
 	if err != nil {
 		t.Fatal(err)
 	}
 	req.Header.Set("Content-Type", "application/json")
 	res := ExcuteRoute(req)
-	var r controllers.Response
+	var r Response
 	json.Unmarshal(res.Body.Bytes(), &r)
 
 	if r.Status != http.StatusOK {
 		t.Errorf("handler returned wrong status code: got %v want %v",
-			r.Status, http.StatusOK)
+			r.Status, NewId)
 	}
 	if r.Message != "success" {
 		t.Errorf("handler returned wrong status code: got %v want %v",
@@ -110,7 +115,7 @@ func TestGetAllUser(t *testing.T) {
 	handler := http.HandlerFunc(controllers.GetAllUser())
 	rr := httptest.NewRecorder()
 	handler.ServeHTTP(rr, req)
-	var r controllers.Response
+	var r Response
 	json.Unmarshal(rr.Body.Bytes(), &r)
 
 	if r.Status != http.StatusOK {
