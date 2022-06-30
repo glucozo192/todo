@@ -10,7 +10,7 @@ import (
 func UserRoute(router *mux.Router) {
 	router.HandleFunc("/user/{Id}", controllers.GetUser()).Methods("GET")
 	router.HandleFunc("/user", middleware.AuthMiddleware(controllers.UpdateMe())).Methods("PUT")
-	router.HandleFunc("/user/{Id}", controllers.DeleteUser()).Methods("DELETE")
+	router.HandleFunc("/user/{Id}", middleware.AuthMiddleware(controllers.DeleteUser())).Methods("DELETE")
 	//----------------------------------------------------------------
 	router.HandleFunc("/user/signup", controllers.Signup()).Methods("POST")
 	router.HandleFunc("/users", middleware.AuthMiddleware(controllers.GetAllUser())).Methods("GET")

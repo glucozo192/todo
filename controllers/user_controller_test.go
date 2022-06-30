@@ -87,11 +87,12 @@ func TestDeleteUser(t *testing.T) {
 	handler := http.HandlerFunc(CreateTestUser())
 	rr := httptest.NewRecorder()
 	handler.ServeHTTP(rr, rq)
-
+	token := "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdXRob3JpemVkIjp0cnVlLCJleHAiOjE2NjA5MDA3MzIsImlkIjoiNjJiZDY0NDRlNTIyYjdhYmQwODY1Mzg3In0.F8LqqnDt9yQKfgcHQGbejQVURxgumVlEBk_kILGE-kc"
 	req, err := http.NewRequest("DELETE", fmt.Sprintf("/user/%s", NewId.Hex()), nil)
 	if err != nil {
 		t.Fatal(err)
 	}
+	req.Header.Set("Authorization", token)
 	req.Header.Set("Content-Type", "application/json")
 	res := ExcuteRoute(req)
 	var r Response
@@ -99,7 +100,7 @@ func TestDeleteUser(t *testing.T) {
 
 	if r.Status != http.StatusOK {
 		t.Errorf("handler returned wrong status code: got %v want %v",
-			r.Status, NewId)
+			r.Status, http.StatusOK)
 	}
 	if r.Message != "success" {
 		t.Errorf("handler returned wrong status code: got %v want %v",

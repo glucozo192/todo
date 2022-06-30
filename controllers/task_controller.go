@@ -119,31 +119,6 @@ func GetTask() http.HandlerFunc {
 	}
 }
 
-func GetAllTask() http.HandlerFunc {
-	return func(rw http.ResponseWriter, r *http.Request) {
-		ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
-		var tasks []models.Task
-		defer cancel()
-		results, err := taskCollection.Find(ctx, bson.M{})
-		if err != nil {
-			untils.Error(rw, err.Error(), http.StatusInternalServerError)
-			return
-		}
-
-		defer results.Close(ctx)
-		for results.Next(ctx) {
-			var singleTask models.Task
-			if err = results.Decode(&singleTask); err != nil {
-				untils.Error(rw, err.Error(), http.StatusInternalServerError)
-				return
-			}
-			tasks = append(tasks, singleTask)
-
-		}
-		responses.WriteResponse(rw, http.StatusOK, tasks)
-	}
-}
-
 func DeleteTask() http.HandlerFunc {
 	return func(rw http.ResponseWriter, r *http.Request) {
 		ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)

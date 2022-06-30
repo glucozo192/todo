@@ -8,7 +8,6 @@ import (
 )
 
 func TaskRoute(router *mux.Router) {
-	router.HandleFunc("/tasks", controllers.GetAllTask()).Methods("GET")
 	router.HandleFunc("/task/{id}", middleware.AuthMiddleware(controllers.GetOneTask())).Methods("GET")
 	router.HandleFunc("/task", middleware.AuthMiddleware(controllers.CreateTask())).Methods("POST")
 	router.HandleFunc("/user-tasks", middleware.AuthMiddleware(controllers.GetTask())).Methods("GET")

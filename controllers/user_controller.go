@@ -95,6 +95,18 @@ func UpdateMe() http.HandlerFunc {
 func DeleteUser() http.HandlerFunc {
 	return func(rw http.ResponseWriter, r *http.Request) {
 		ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+		var user models.User
+		// Get id from token
+		Id_Admin := r.Context().Value("Id_User").(string)
+		adminId, _ := primitive.ObjectIDFromHex(Id_Admin)
+		// Get User
+		_ = userCollection.FindOne(ctx, bson.M{"id": adminId}).Decode(&user)
+		defer cancel()
+		if user.Role != "admin" {
+			untils.Error(rw, "do not permission", http.StatusInternalServerError)
+			return
+		}
+
 		params := mux.Vars(r)
 		userId := params["Id"]
 		objId, _ := primitive.ObjectIDFromHex(userId)

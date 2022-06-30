@@ -46,6 +46,8 @@ func TestSignup(t *testing.T) {
 	}
 
 	rq, _ := http.NewRequest("DELETE", fmt.Sprintf("/user/%s", r.Data["id"]), nil)
+	token := "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdXRob3JpemVkIjp0cnVlLCJleHAiOjE2NjA5MDA3MzIsImlkIjoiNjJiZDY0NDRlNTIyYjdhYmQwODY1Mzg3In0.F8LqqnDt9yQKfgcHQGbejQVURxgumVlEBk_kILGE-kc"
+	req.Header.Set("Authorization", token)
 	req.Header.Set("Content-Type", "application/json")
 	_ = ExcuteRoute(rq)
 }

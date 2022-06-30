@@ -42,7 +42,7 @@ func TestMain(m *testing.M) {
 
 func UserRoute(router *mux.Router) {
 	router.HandleFunc("/user/{Id}", controllers.GetUser()).Methods("GET")
-	router.HandleFunc("/user/{Id}", controllers.DeleteUser()).Methods("DELETE")
+	router.HandleFunc("/user/{Id}", middleware.AuthMiddleware(controllers.DeleteUser())).Methods("DELETE")
 	router.Handle("/task/{id}", middleware.AuthMiddleware(controllers.GetOneTask())).Methods("GET")
 	router.Handle("/task/{id}", middleware.AuthMiddleware(controllers.UpdateTask())).Methods("PUT")
 	router.Handle("/task/status/{id}", middleware.AuthMiddleware(controllers.UpdateTaskStatus())).Methods("PUT")
