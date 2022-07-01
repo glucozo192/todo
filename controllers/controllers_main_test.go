@@ -26,7 +26,10 @@ var NewId primitive.ObjectID
 
 var a App
 var NewToken string
-var tokenMain string = "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdXRob3JpemVkIjp0cnVlLCJleHAiOjE2NjA5MDAxMzQsImlkIjoiNjJiZDY4MjYyOWFmNTIwMzU2ZjhmYzBhIn0.CP6ubpuPdd67ERZAZ7tL1NHQ7QCZO-usiIxYFU7gwik"
+
+// token from
+var tokenAdmin string = "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdXRob3JpemVkIjp0cnVlLCJleHAiOjE2NjA5NTM1MDAsImlkIjoiNjJiZDY0NDRlNTIyYjdhYmQwODY1Mzg3Iiwicm9sZSI6ImFkbWluIn0.iHhmOtWBXa7kYLe4z-3MbIOwAqPxvWjirZwmZ7OSdkA"
+var tokenMain string = "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdXRob3JpemVkIjp0cnVlLCJleHAiOjE2NjA5NTM0MDcsImlkIjoiNjJiZDY4MjYyOWFmNTIwMzU2ZjhmYzBhIiwicm9sZSI6InVzZXIifQ.lne_0e56hJGui22EWmZN6RcSS4iB0eu4oSyMQTTcQoo"
 var userCollection *mongo.Collection = configs.GetCollection(configs.DB, "users")
 
 func TestMain(m *testing.M) {
@@ -64,6 +67,7 @@ func CreateTestUser() http.HandlerFunc {
 		username := "testuser"
 		password := "123456"
 		name := "test"
+
 		hashPwd, _ := models.HashPassword(password)
 		newUser := models.User{
 			Id:       Id,
@@ -71,11 +75,12 @@ func CreateTestUser() http.HandlerFunc {
 			Password: hashPwd,
 			Name:     name,
 			Limit:    10,
+			Role:     "user",
 		}
 		NewId = Id
 		// add obj
 		_, _ = userCollection.InsertOne(ctx, newUser)
-		Token, _ := middleware.CreateToken(newUser.Id)
+		Token, _ := middleware.CreateToken(newUser.Id, newUser.Role)
 		NewToken = "Bearer " + Token
 	}
 }

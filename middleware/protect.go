@@ -43,15 +43,19 @@ func AuthMiddleware(next http.HandlerFunc) http.HandlerFunc {
 			untils.Error(rw, "token invalid", http.StatusBadRequest)
 			return
 		}
+		Role_User := claims["role"].(string)
 		Id_User := claims["id"].(string)
-		ctx := context.WithValue(r.Context(), "Id_User", Id_User)
+
+		Role_Id := Role_User + " " + Id_User
+		ctx := context.WithValue(r.Context(), "Role_Id", Role_Id)
 		next.ServeHTTP(rw, r.WithContext(ctx))
 	})
 }
 
-func CreateToken(id primitive.ObjectID) (string, error) {
+func CreateToken(id primitive.ObjectID, role string) (string, error) {
 	claims := jwt.MapClaims{}
 	claims["authorized"] = true
+	claims["role"] = role
 	claims["id"] = id
 	claims["exp"] = time.Now().Add(time.Hour * 1200).Unix() //Token expires after 12h
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)

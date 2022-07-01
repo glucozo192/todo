@@ -21,7 +21,7 @@ type Response struct {
 
 func TestCreateToken(t *testing.T) {
 	Id, _ := primitive.ObjectIDFromHex("62babd50490c2a487815bc71")
-	Result, _ := CreateToken(Id)
+	Result, _ := CreateToken(Id, "user")
 
 	claims := jwt.MapClaims{}
 	_, _ = jwt.ParseWithClaims(Result, claims, func(token *jwt.Token) (interface{}, error) {

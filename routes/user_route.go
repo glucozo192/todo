@@ -16,4 +16,5 @@ func UserRoute(router *mux.Router) {
 	router.HandleFunc("/users", middleware.AuthMiddleware(controllers.GetAllUser())).Methods("GET")
 	router.HandleFunc("/user/login", controllers.Login()).Methods("POST")
 	router.HandleFunc("/me", middleware.AuthMiddleware(controllers.GetMe())).Methods("GET")
+	router.HandleFunc("/limit", middleware.AuthMiddleware(controllers.UpdateLimit())).Methods("PUT")
 }

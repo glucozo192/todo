@@ -82,7 +82,7 @@ func TestUpdateTask(t *testing.T) {
 	req, _ := http.NewRequest("PUT", "/task/62bd693829af520356f8fc12", bytes.NewBuffer(jsonStr))
 
 	//send token
-	token := "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdXRob3JpemVkIjp0cnVlLCJleHAiOjE2NjA5MDA0MDYsImlkIjoiNjJiZDY5MzYyOWFmNTIwMzU2ZjhmYzEwIn0.hRHTzdk4Cy2t-tIaorXgoT87WPXRZlN3dC_vimgVE5Y"
+	token := "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdXRob3JpemVkIjp0cnVlLCJleHAiOjE2NjA5NTM5MTcsImlkIjoiNjJiZDY5MzYyOWFmNTIwMzU2ZjhmYzEwIiwicm9sZSI6InVzZXIifQ.-wSRPXY30nxe8P9uzZDyHe8tgXWrb2Vh-LtOU6moS8Y"
 	req.Header.Set("Authorization", token)
 	res := ExcuteRoute(req)
 	var r Response

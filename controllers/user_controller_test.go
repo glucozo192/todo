@@ -31,8 +31,8 @@ func TestGetMe(t *testing.T) {
 	}
 	//check user
 	if r.Data["username"] != "tuantest" {
-		t.Errorf("handler returned wrong status code: got %v want %v",
-			r.Data["username"], "tuanchoi1")
+		t.Errorf("handler returned wrong value: got %v want %v",
+			r.Data["username"], "tuantest")
 	}
 }
 
@@ -52,7 +52,7 @@ func TestGetUser(t *testing.T) {
 	}
 
 	if r.Data["username"] != "tuantest" {
-		t.Errorf("handler returned wrong status code: got %v want %v",
+		t.Errorf("handler returned wrong  value: got %v want %v",
 			r.Data["username"], "tuanchoi1")
 	}
 
@@ -77,7 +77,7 @@ func TestUpdateMe(t *testing.T) {
 	}
 
 	if r.Data["name"] != "Test tuandz" {
-		t.Errorf("handler returned wrong status code: got %v want %v",
+		t.Errorf("handler returned wrong value: got %v want %v",
 			r.Data["name"], "Test tuandz")
 	}
 }
@@ -87,7 +87,7 @@ func TestDeleteUser(t *testing.T) {
 	handler := http.HandlerFunc(CreateTestUser())
 	rr := httptest.NewRecorder()
 	handler.ServeHTTP(rr, rq)
-	token := "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdXRob3JpemVkIjp0cnVlLCJleHAiOjE2NjA5MDA3MzIsImlkIjoiNjJiZDY0NDRlNTIyYjdhYmQwODY1Mzg3In0.F8LqqnDt9yQKfgcHQGbejQVURxgumVlEBk_kILGE-kc"
+	token := tokenAdmin
 	req, err := http.NewRequest("DELETE", fmt.Sprintf("/user/%s", NewId.Hex()), nil)
 	if err != nil {
 		t.Fatal(err)
@@ -113,7 +113,7 @@ func TestGetAllUser(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	token := "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdXRob3JpemVkIjp0cnVlLCJleHAiOjE2NjA5MDA3MzIsImlkIjoiNjJiZDY0NDRlNTIyYjdhYmQwODY1Mzg3In0.F8LqqnDt9yQKfgcHQGbejQVURxgumVlEBk_kILGE-kc"
+	token := tokenAdmin
 	req.Header.Set("Authorization", token)
 	req.Header.Set("Content-Type", "application/json")
 	handler := http.HandlerFunc(middleware.AuthMiddleware(controllers.GetAllUser()))
@@ -125,5 +125,31 @@ func TestGetAllUser(t *testing.T) {
 	if r.Status != http.StatusOK {
 		t.Errorf("handler returned wrong status code: got %v want %v",
 			r.Status, http.StatusOK)
+	}
+}
+
+func TestUpdateLimit(t *testing.T) {
+	req, err := http.NewRequest("PUT", "/limit", nil)
+	if err != nil {
+		t.Fatal(err)
+	}
+	token := tokenMain
+	req.Header.Set("Authorization", token)
+
+	req.Header.Set("Content-Type", "application/json")
+	rr := httptest.NewRecorder()
+	handler := http.Handler(middleware.AuthMiddleware(controllers.UpdateLimit()))
+	handler.ServeHTTP(rr, req)
+	var r Response
+	json.Unmarshal(rr.Body.Bytes(), &r)
+
+	if r.Status != http.StatusOK {
+		t.Errorf("handler returned wrong status code: got %v want %v",
+			r.Status, http.StatusOK)
+	}
+
+	if r.Data["limit"].(float64) != 100 {
+		t.Errorf("handler returned wrong: got %v want %v",
+			r.Data["limit"], "100")
 	}
 }

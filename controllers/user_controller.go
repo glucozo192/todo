@@ -5,6 +5,8 @@ import (
 	"TOGO/models"
 	"TOGO/responses"
 	"TOGO/untils"
+	"fmt"
+	"strings"
 
 	"context"
 	"encoding/json"
@@ -50,8 +52,11 @@ func UpdateMe() http.HandlerFunc {
 		var user_client models.User
 		defer cancel()
 		// Get id from token
-		Id_User := r.Context().Value("Id_User").(string)
-		objId, _ := primitive.ObjectIDFromHex(Id_User)
+		data := r.Context().Value("Role_Id").(string)
+		Role_Id := strings.Split(data, " ")
+		// role := Role_Id[0]
+		id := Role_Id[1]
+		objId, _ := primitive.ObjectIDFromHex(id)
 
 		// r.Body == user_client
 		if err := json.NewDecoder(r.Body).Decode(&user_client); err != nil {
@@ -95,14 +100,12 @@ func UpdateMe() http.HandlerFunc {
 func DeleteUser() http.HandlerFunc {
 	return func(rw http.ResponseWriter, r *http.Request) {
 		ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
-		var user models.User
-		// Get id from token
-		Id_Admin := r.Context().Value("Id_User").(string)
-		adminId, _ := primitive.ObjectIDFromHex(Id_Admin)
-		// Get User
-		_ = userCollection.FindOne(ctx, bson.M{"id": adminId}).Decode(&user)
+		// Get role from token
+		data := r.Context().Value("Role_Id").(string)
+		Role_Id := strings.Split(data, " ")
+		role := Role_Id[0]
 		defer cancel()
-		if user.Role != "admin" {
+		if role != "admin" {
 			untils.Error(rw, "do not permission", http.StatusInternalServerError)
 			return
 		}
@@ -110,7 +113,6 @@ func DeleteUser() http.HandlerFunc {
 		params := mux.Vars(r)
 		userId := params["Id"]
 		objId, _ := primitive.ObjectIDFromHex(userId)
-		defer cancel()
 		// detele task of user
 		results, err := taskCollection.Find(ctx, bson.M{"id_user": objId})
 		if err != nil {
@@ -151,25 +153,18 @@ func DeleteUser() http.HandlerFunc {
 
 func GetAllUser() http.HandlerFunc {
 	return func(rw http.ResponseWriter, r *http.Request) {
+		fmt.Println("go to get all")
 		ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
-		var user models.User
 		var users []models.User
 		defer cancel()
 
-		// Get id from token
-		Id_User := r.Context().Value("Id_User").(string)
-		objId, _ := primitive.ObjectIDFromHex(Id_User)
-
-		// Get User
-		err := userCollection.FindOne(ctx, bson.M{"id": objId}).Decode(&user)
-
-		if user.Role != "admin" {
+		// Get role from token
+		data := r.Context().Value("Role_Id").(string)
+		Role_Id := strings.Split(data, " ")
+		role := Role_Id[0]
+		//id := Role_Id[1]
+		if role != "admin" {
 			untils.Error(rw, "do not permission", http.StatusInternalServerError)
-			return
-		}
-
-		if err != nil {
-			untils.Error(rw, err.Error(), http.StatusInternalServerError)
 			return
 		}
 
@@ -200,8 +195,12 @@ func GetMe() http.HandlerFunc {
 		ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 		var user models.User
 		defer cancel()
-		Id_User := r.Context().Value("Id_User").(string)
-		objId, _ := primitive.ObjectIDFromHex(Id_User)
+		data := r.Context().Value("Role_Id").(string)
+		Role_Id := strings.Split(data, " ")
+		// role := Role_Id[0]
+		id := Role_Id[1]
+
+		objId, _ := primitive.ObjectIDFromHex(id)
 
 		err := userCollection.FindOne(ctx, bson.M{"id": objId}).Decode(&user)
 		if err != nil {
@@ -209,8 +208,47 @@ func GetMe() http.HandlerFunc {
 			return
 		}
 
-		res := map[string]interface{}{"username": user.Username, "name": user.Name, "id": user.Id}
+		res := map[string]interface{}{"username": user.Username, "name": user.Name, "id": user.Id, "limit": user.Limit, "role": user.Role}
 		responses.WriteResponseUser(rw, "", http.StatusOK, res)
 
+	}
+}
+
+func UpdateLimit() http.HandlerFunc {
+	return func(rw http.ResponseWriter, r *http.Request) {
+		ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+		var user models.User
+		defer cancel()
+
+		data := r.Context().Value("Role_Id").(string)
+		Role_Id := strings.Split(data, " ")
+		//role := Role_Id[0]
+		id := Role_Id[1]
+		objId, _ := primitive.ObjectIDFromHex(id)
+
+		err := userCollection.FindOne(ctx, bson.M{"id": objId}).Decode(&user)
+		if err != nil {
+			untils.Error(rw, err.Error(), http.StatusInternalServerError)
+			return
+		}
+		update := bson.M{"limit": 100}
+
+		result, err := userCollection.UpdateOne(ctx, bson.M{"id": objId}, bson.M{"$set": update})
+		if err != nil {
+			untils.Error(rw, err.Error(), http.StatusInternalServerError)
+			return
+		}
+
+		//get updated task details
+		var updatedUser models.User
+		if result.MatchedCount == 1 {
+			err := userCollection.FindOne(ctx, bson.M{"id": objId}).Decode(&updatedUser)
+			if err != nil {
+				untils.Error(rw, err.Error(), http.StatusInternalServerError)
+				return
+			}
+		}
+		res := map[string]interface{}{"id": updatedUser.Id, "name": updatedUser.Name, "username": updatedUser.Username, "limit": updatedUser.Limit}
+		responses.WriteResponse(rw, http.StatusOK, res)
 	}
 }

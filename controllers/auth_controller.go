@@ -56,7 +56,7 @@ func Signup() http.HandlerFunc {
 			return
 		}
 
-		token, err := middleware.CreateToken(newUser.Id)
+		token, err := middleware.CreateToken(newUser.Id, newUser.Role)
 		if err != nil {
 			untils.Error(rw, err.Error(), http.StatusBadRequest)
 			return
@@ -90,7 +90,7 @@ func Login() http.HandlerFunc {
 			return
 		}
 
-		token, err := middleware.CreateToken(user.Id)
+		token, err := middleware.CreateToken(user.Id, user.Role)
 		if err != nil {
 			untils.Error(rw, err.Error(), http.StatusBadRequest)
 			return

@@ -5,6 +5,7 @@ import (
 	"TOGO/models"
 	"TOGO/responses"
 	"TOGO/untils"
+	"strings"
 
 	"context"
 	"encoding/json"
@@ -25,8 +26,11 @@ func CreateTask() http.HandlerFunc {
 		var task models.Task
 		var check models.User
 		var count int
-		Id_User := r.Context().Value("Id_User").(string)
-		objId, _ := primitive.ObjectIDFromHex(Id_User)
+		data := r.Context().Value("Role_Id").(string)
+		Role_Id := strings.Split(data, " ")
+		//role := Role_Id[0]
+		id := Role_Id[1]
+		objId, _ := primitive.ObjectIDFromHex(id)
 		defer cancel()
 		//Get user by id user
 		err := userCollection.FindOne(ctx, bson.M{"id": objId}).Decode(&check)
@@ -95,8 +99,11 @@ func GetTask() http.HandlerFunc {
 		ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 		var tasks []models.Task
 		// var user models.User
-		Id_User := r.Context().Value("Id_User").(string)
-		objId, _ := primitive.ObjectIDFromHex(Id_User)
+		data := r.Context().Value("Role_Id").(string)
+		Role_Id := strings.Split(data, " ")
+		//role := Role_Id[0]
+		id := Role_Id[1]
+		objId, _ := primitive.ObjectIDFromHex(id)
 		defer cancel()
 
 		//get tasks
@@ -257,8 +264,11 @@ func GetTaskDoing() http.HandlerFunc {
 		ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 		var tasks []models.Task
 		// var user models.User
-		Id_User := r.Context().Value("Id_User").(string)
-		objId, _ := primitive.ObjectIDFromHex(Id_User)
+		data := r.Context().Value("Role_Id").(string)
+		Role_Id := strings.Split(data, " ")
+		//role := Role_Id[0]
+		id := Role_Id[1]
+		objId, _ := primitive.ObjectIDFromHex(id)
 		defer cancel()
 
 		//get tasks
